@@ -1,0 +1,124 @@
+name: Flutter Web Preview Build
+# . Before you push to main, you need to create a new branch named live_preview
+# . Then go to Sttings> Pages and select the live_preview branch as the source and the /(docs) directory.
+# . Then, you need to create a new workflow file named deploy_live_preview.yml in the .github/workflows directory.
+# . Add the following code to the deploy_live_preview.yml file:
+
+on:
+  push:
+    branches: [main] #. Specify the main/master branch name
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Reset live_preview branch to main
+        run: |
+          # Create or checkout live_preview branch
+          git checkout live_preview 2>/dev/null || git checkout -b live_preview
+          # Force reset to main branch state
+          git fetch origin main
+          git reset --hard origin/main
+          # Force push to update live_preview branch
+          git push -f origin live_preview
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          flutter pub add device_preview
+          flutter pub add device_preview_screenshot
+          flutter pub get
+
+      - name: Update main.dart for preview
+        run: |
+          # Ensure we're creating a fresh main.dart
+          cat > lib/main.dart << 'EOL' #. Replace with your main.dart content
+          import 'package:device_preview_screenshot/device_preview_screenshot.dart';
+          import 'package:flutter/material.dart';
+          import 'package:pay_roll/ui/attendance/attendance.dart';
+          import 'package:pay_roll/ui/auth/auth_wrapper.dart';
+          import 'package:provider/provider.dart';
+
+          void main() async {
+            WidgetsFlutterBinding.ensureInitialized();
+            runApp(
+              DevicePreview(
+                backgroundColor: Colors.white,
+                tools: const [
+                  DeviceSection(
+                    frameVisibility: false,
+                    orientation: false,
+                    virtualKeyboard: true,
+                  ),
+                  SystemSection(
+                    locale: false,
+                    theme: false,
+                  ),
+                  DevicePreviewScreenshot(),
+                  SettingsSection(),
+                ],
+                devices: [
+                  Devices.android.samsungGalaxyA50,
+                  Devices.android.samsungGalaxyNote20,
+                  Devices.android.samsungGalaxyS20,
+                  Devices.android.samsungGalaxyNote20Ultra,
+                  Devices.android.onePlus8Pro,
+                  Devices.android.sonyXperia1II,
+                  Devices.ios.iPhoneSE,
+                  Devices.ios.iPhone12,
+                  Devices.ios.iPhone12Mini,
+                  Devices.ios.iPhone12ProMax,
+                  Devices.ios.iPhone13,
+                  Devices.ios.iPhone13ProMax,
+                  Devices.ios.iPhone13Mini,
+                  Devices.ios.iPhoneSE,
+                ],
+                builder: (context) => MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider(create: (_) => TimerProvider()),
+                  ],
+                  child: MaterialApp(
+                    debugShowCheckedModeBanner: false,
+                    locale: DevicePreview.locale(context),
+                    builder: DevicePreview.appBuilder,
+                    home: const AuthWrapper(),
+                  ),
+                ),
+              ),
+            );
+          }
+          EOL
+
+      - name: Build Web
+        run: flutter build web --base-href "/flutter_pay_roll/" #. Specify the base href
+
+      - name: Update docs directory
+        run: |
+          # Remove old docs and create new one
+          rm -rf docs
+          mkdir -p docs
+          # Copy web build to docs
+          cp -r build/web/. docs/
+
+      - name: Commit and push preview changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # Stage all changes
+          git add docs lib/main.dart
+          git commit -m "Update web preview build" || echo "No changes to commit"
+          # Force push to ensure clean state
+          git push -f origin live_preview
