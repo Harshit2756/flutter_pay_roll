@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     DevicePreview(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       tools: const [
         DeviceSection(
           frameVisibility: false,
