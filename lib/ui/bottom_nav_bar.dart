@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pay_roll/shared/Contants.dart';
+import 'package:pay_roll/shared/contants.dart';
 import 'package:pay_roll/ui/attendance/attendance.dart';
 import 'package:pay_roll/ui/history/history.dart';
 import 'package:pay_roll/ui/home/home.dart';
