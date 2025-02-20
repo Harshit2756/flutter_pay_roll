@@ -8,27 +8,32 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     DevicePreview(
+      enabled: false,
       backgroundColor: Colors.white,
       tools: const [
         DeviceSection(
-          frameVisibility: false,
+          frameVisibility: true,
           orientation: false,
           virtualKeyboard: true,
+          model: true,
         ),
         SystemSection(
           locale: false,
           theme: false,
         ),
+        SettingsSection(
+          backgroundTheme: true,
+          toolsTheme: true,
+        ),
         DevicePreviewScreenshot(),
-        SettingsSection(),
       ],
       devices: [
+        Devices.android.onePlus8Pro,
+        Devices.android.sonyXperia1II,
         Devices.android.samsungGalaxyA50,
         Devices.android.samsungGalaxyNote20,
         Devices.android.samsungGalaxyS20,
         Devices.android.samsungGalaxyNote20Ultra,
-        Devices.android.onePlus8Pro,
-        Devices.android.sonyXperia1II,
         Devices.ios.iPhoneSE,
         Devices.ios.iPhone12,
         Devices.ios.iPhone12Mini,
