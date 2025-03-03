@@ -8,23 +8,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     DevicePreview(
-      enabled: false,
-      backgroundColor: Colors.white,
+      enabled: true,
+      backgroundColor: Colors.black87,
       tools: const [
-        DeviceSection(
-          frameVisibility: true,
-          orientation: false,
-          virtualKeyboard: true,
-          model: true,
-        ),
-        SystemSection(
-          locale: false,
-          theme: false,
-        ),
-        SettingsSection(
-          backgroundTheme: true,
-          toolsTheme: true,
-        ),
+        DeviceSection(frameVisibility: true, orientation: false, virtualKeyboard: true, model: true),
+        SettingsSection(backgroundTheme: false, toolsTheme: true),
+        // SystemSection(locale: false, theme: false),
         DevicePreviewScreenshot(),
       ],
       devices: [

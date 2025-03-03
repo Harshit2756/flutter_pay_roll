@@ -222,7 +222,7 @@ jobs:
                   _buildSocialLink(
                     icon: FontAwesomeIcons.globe,
                     label: 'Portfolio',
-                    url: 'https://harshit2756.github.io/portfolio/',
+                    url: 'https://harshit-khandelwal.web.app/',
                   ),
                   _buildSocialLink(
                     icon: FontAwesomeIcons.github,
@@ -307,19 +307,17 @@ jobs:
             WidgetsFlutterBinding.ensureInitialized();
             runApp(
               DevicePreview(
-                backgroundColor: Colors.black,
+                enabled: true,
+                backgroundColor: Colors.black87,
                 tools: const [
-                  DeviceSection(
-                    frameVisibility: false,
-                    orientation: false,
-                    virtualKeyboard: true,
+                  CustomPlugin(
+                    apkDownloadUrl: "https://github.com/${{ github.repository }}/releases/download/v1.0.${{ github.run_number }}/app-release.apk",
+                    sourceCodeUrl: "https://github.com/${{ github.repository }}/archive/refs/tags/v1.0.${{ github.run_number }}.zip",
                   ),
-                  SystemSection(
-                    locale: false,
-                    theme: false,
-                  ),
+                  DeviceSection(frameVisibility: true, orientation: false, virtualKeyboard: true, model: true),
+                  SettingsSection(backgroundTheme: false, toolsTheme: true),
+                  // SystemSection(locale: false, theme: false),
                   DevicePreviewScreenshot(),
-                  SettingsSection(),
                 ],
                 devices: [
                   Devices.android.samsungGalaxyA50,
